@@ -1,55 +1,62 @@
 # Karana Investment Group — Website
 
-Single-page static site (plain HTML/CSS, no build step). Hosted on **Hostinger**,
+Multi-section marketing site with a PHP contact-form handler. Static HTML/CSS/JS +
+one PHP script — **no build step**. Hosted on **Hostinger** (needs PHP + `mail()`),
 source on **GitHub**.
 
 ## Files
 
 | File | Purpose |
 |---|---|
-| `index.html` | Page content |
+| `index.html` | Main page (hero, about, criteria, partnerships, inquiry forms) |
 | `styles.css` | Visual design + mobile layout |
+| `script.js` | Mobile menu + inquiry dialog (`<dialog>`) |
+| `submit.php` | Form handler — emails inquiries to `info@karanainvest.com`, then redirects to `thank-you.html` |
+| `thank-you.html` | Post-submit confirmation page |
+| `assets/` | Logo + hero banner |
 | `.htaccess` | HTTPS redirect, security headers, caching, compression (Apache/Hostinger) |
-| `robots.txt` / `sitemap.xml` | Search engine basics |
+| `robots.txt` / `sitemap.xml` | Search engine basics (domain: `karanainvest.com`) |
 | `.github/workflows/deploy.yml` | Auto-deploy to Hostinger on push to `main` |
 
 ## Before public launch
 
-- Replace `contact@karanainvestmentgroup.com` in `index.html` with the confirmed company email.
-- Confirm the legal name / ending (LLC, Inc.).
-- Update the domain in `robots.txt` and `sitemap.xml` if it isn't `karanainvestmentgroup.com`.
+- Confirm the domain is `karanainvest.com` — otherwise update the canonical/OG tags in
+  `index.html`, `robots.txt`, and `sitemap.xml`.
+- Create the mailbox `info@karanainvest.com` in Hostinger (hPanel → Emails) so
+  `submit.php` can deliver.
+- Send one test inquiry after deploying. If it doesn't arrive: confirm PHP `mail()` is
+  enabled for the plan, and check the spam folder.
+- Have a securities attorney review the final public copy before any fundraising —
+  the copy is written to avoid publicly offering securities or quoting returns.
 
 ## Push to GitHub
 
 ```bash
 cd "C:\Users\User\Karana Investment Group\karanainvest"
-git branch -M main
-git remote add origin https://github.com/<you>/karanainvest.git
-git push -u origin main
+git push
 ```
 
-(Or create the repo with `gh repo create karanainvest --private --source . --push`.)
+Remote `origin` is already set to `https://github.com/crawfordseven1-stack/karanainvest`.
 
 ## Deploy to Hostinger — pick one
 
-### Option A: Hostinger's built-in Git (simplest, no secrets)
+### Option A: Hostinger's built-in Git (in hPanel, not GitHub)
 
 1. hPanel → your website → **Advanced → GIT**.
-2. Repository: `https://github.com/<you>/karanainvest.git`, branch `main`,
-   directory: leave blank (deploys into `public_html`).
-3. **Create**, then **Deploy**. For auto-deploy, copy the webhook URL shown and add it
-   in GitHub → repo **Settings → Webhooks** (content type `application/json`).
+2. Repository `https://github.com/crawfordseven1-stack/karanainvest.git`, branch `main`,
+   directory blank (deploys into `public_html`).
+3. **Create**, then use the **Deploy** button on the repo row. For auto-deploy, add the
+   webhook URL it shows to GitHub → repo **Settings → Webhooks** (`application/json`).
+   - Private repo: add the SSH key hPanel shows you to GitHub → repo **Settings → Deploy keys** first.
 
-### Option B: GitHub Actions over FTP (already wired up)
+### Option B: GitHub Actions over FTP (workflow already included)
 
-1. hPanel → **Files → FTP Accounts** — note the FTP host, username, password.
-2. GitHub repo → **Settings → Secrets and variables → Actions** → add:
-   - `FTP_SERVER` (e.g. `ftp://yourdomain.com`)
-   - `FTP_USERNAME`
-   - `FTP_PASSWORD`
-3. Push to `main` — `deploy.yml` uploads the site to `public_html/`.
-   Adjust `server-dir` in the workflow if the domain uses a subfolder or addon domain.
+1. hPanel → **Files → FTP Accounts** — note host, username, password.
+2. GitHub repo → **Settings → Secrets and variables → Actions** → add
+   `FTP_SERVER`, `FTP_USERNAME`, `FTP_PASSWORD`.
+3. Push to `main` (or run the workflow from the **Actions** tab). Uploads to `public_html/`.
 
 ## Local preview
 
-Open `index.html` in a browser, or run `npx serve` in this folder.
+`index.html` opens in a browser, but the contact form needs PHP: run `php -S localhost:8000`
+in this folder to test `submit.php` (mail delivery only works on the real host).
