@@ -30,4 +30,5 @@ jobs:
             **/.git*/**
             **/.github/**
             **/README.md
+            **/READ_ME_FIRST.txt
             **/node_modules/**
